@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_app/provider/cart.dart';
 import 'package:shop_app/screens/cart_Sceen.dart';
+import 'package:shop_app/widgets/app_drawer.dart';
 import 'package:shop_app/widgets/badge.dart';
 
 import '../provider/product_provider.dart';
@@ -13,6 +14,8 @@ enum FilterOption {
 }
 
 class ProductOverviewScreen extends StatefulWidget {
+  static const routeName = '/product-overview-screen'
+  ;
   @override
   _ProductOverviewScreenState createState() => _ProductOverviewScreenState();
 }
@@ -23,6 +26,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
   Widget build(BuildContext context) {
     final productsContainer = Provider.of<Products>(context);
     return Scaffold(
+      drawer: AppDrawer(),
       appBar: AppBar(
         actions: [
           PopupMenuButton(

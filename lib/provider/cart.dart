@@ -29,6 +29,17 @@ class Cart extends ChangeNotifier {
       total += cartItem.price * cartItem.quantity;
     });
     return total;
+    notifyListeners();
+  }
+
+  void removeItem(String productId) {
+    _items.remove(productId);
+    notifyListeners();
+  }
+
+  void clearCart() {
+    _items = {};
+    notifyListeners();
   }
 
   void addItems({String productId, double price, String title}) {

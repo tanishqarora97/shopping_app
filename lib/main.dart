@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/provider/order.dart';
 import 'package:shop_app/screens/cart_Sceen.dart';
+import 'package:shop_app/screens/order_screen.dart';
 
 import './provider/cart.dart';
 import './provider/product_provider.dart';
@@ -21,6 +23,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => Cart(),
         ),
+        ChangeNotifierProvider(
+          create: (context) => Order(),
+        )
       ],
       child: MaterialApp(
         title: 'MyShop',
@@ -30,6 +35,8 @@ class MyApp extends StatelessWidget {
           fontFamily: GoogleFonts.lato().fontFamily,
         ),
         routes: {
+          ProductOverviewScreen.routeName: (context) => ProductOverviewScreen(),
+          OrdersScreen.routeName: (context) => OrdersScreen(),
           ProductDetailsScreen.routeName: (context) => ProductDetailsScreen(),
           CartScreen.routeName: (context) => CartScreen(),
         },
