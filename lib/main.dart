@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:shop_app/provider/order.dart';
-import 'package:shop_app/screens/cart_Sceen.dart';
-import 'package:shop_app/screens/order_screen.dart';
+import 'package:shop_app/screens/edit_product_screen.dart';
 
+import './screens/user_product_screen.dart';
+import './provider/order.dart';
+import './screens/cart_screen.dart';
+import './screens/order_screen.dart';
 import './provider/cart.dart';
 import './provider/product_provider.dart';
 import './screens/product_overview_sceen.dart';
@@ -35,6 +37,8 @@ class MyApp extends StatelessWidget {
           fontFamily: GoogleFonts.lato().fontFamily,
         ),
         routes: {
+          UserProductScreen.routeName: (context) => UserProductScreen(),
+          EditProductScreen.routename: (context) => EditProductScreen(),
           ProductOverviewScreen.routeName: (context) => ProductOverviewScreen(),
           OrdersScreen.routeName: (context) => OrdersScreen(),
           ProductDetailsScreen.routeName: (context) => ProductDetailsScreen(),

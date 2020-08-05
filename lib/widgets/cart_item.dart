@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop_app/provider/cart.dart';
+
+import '../provider/cart.dart';
 
 class CartItem extends StatelessWidget {
   final String id;
@@ -17,13 +18,10 @@ class CartItem extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    final cart = Provider.of<Cart>(context, listen: false);
+    // final cart = Provider.of<Cart>(context, listen: false);
     return Dismissible(
       direction: DismissDirection.endToStart,
-      key: ObjectKey(id),
-      onDismissed: (DismissDirection direction) {
-        Provider.of<Cart>(context, listen: false).removeItem(productId);
-      },
+      key: ValueKey(id),
       background: Container(
         padding: EdgeInsets.all(10.0),
         alignment: Alignment.centerRight,
@@ -33,6 +31,32 @@ class CartItem extends StatelessWidget {
         ),
         color: Theme.of(context).errorColor,
       ),
+      confirmDismiss: (direction) {
+        return showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text('Are you Sure?'),
+            content: Text('Do you want to remove item from cart?'),
+            actions: [
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop(false);
+                },
+                child: Text('NO'),
+              ),
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop(true);
+                },
+                child: Text('Yes'),
+              ),
+            ],
+          ),
+        );
+      },
+      onDismissed: (DismissDirection direction) {
+        Provider.of<Cart>(context, listen: false).removeItem(productId);
+      },
       child: Card(
         margin: EdgeInsets.symmetric(
           vertical: 5.0,
@@ -44,7 +68,7 @@ class CartItem extends StatelessWidget {
             leading: CircleAvatar(
               child: Padding(
                 padding: const EdgeInsets.all(5.0),
-                child: FittedBox(child: Text('\$${price}')),
+                child: FittedBox(child: Text('\$$price')),
               ),
             ),
             title: Text(title),
