@@ -6,8 +6,6 @@ import 'package:http/http.dart' as http;
 
 import 'product.dart';
 
-const url = 'https://test-project-53c14.firebaseio.com/products.json';
-
 class Products with ChangeNotifier {
   List<Product> _items = [];
   List<Product> get favItems {
@@ -37,10 +35,27 @@ class Products with ChangeNotifier {
   //   _showIsFovorites = false;
   //   notifyListeners();
   // }
-  void updateProduct(String id, Product newProduct) {
+  Future<void> updateProduct(String id, Product newProduct) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
-      _items[prodIndex] = newProduct;
+      final url = 'https://test-project-53c14.firebaseio.com/products/$id.json';
+      try {
+        await http.patch(url,
+            body: json.encode({
+              'title': newProduct.title,
+              'price': newProduct.price,
+              'imageUrl': newProduct.imageUrl,
+              'description': newProduct.description,
+              // 'isFavorite': newProduct.isFavorite,
+              //  'id': newProduct.id,
+            }));
+        _items[prodIndex] = newProduct;
+        print('Data Updated successfully');
+        notifyListeners();
+      } catch (e) {
+        print(e);
+        throw e;
+      }
     } else {
       print('prod index not found');
     }
@@ -54,6 +69,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProduct() async {
+    const url = 'https://test-project-53c14.firebaseio.com/products.json';
     try {
       final response = await http.get(url);
       // print('upcoming data:--${response.body}');
@@ -80,6 +96,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> addProduct(Product product) async {
+    const url = 'https://test-project-53c14.firebaseio.com/products.json';
     //   const url = 'https://test-project-53c14.firebaseio.com/products.json';
     try {
       final response = await http.post(
