@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:shop_app/models/http_exception.dart';
 
 import 'product.dart';
 
@@ -63,9 +64,22 @@ class Products with ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteProduct(String id) {
-    _items.removeWhere((prodID) => prodID.id == id);
+  Future<void> deleteProduct(String id) async {
+    final url = 'https://test-project-53c14.firebaseio.com/products/$id.json';
+    final existingProductIndex =
+        _items.indexWhere((product) => product.id == id);
+    var existingProduct = _items[existingProductIndex];
+    _items.removeAt(existingProductIndex);
     notifyListeners();
+    final value = await http.delete(url);
+
+    print(value.statusCode);
+    if (value.statusCode >= 400) {
+      _items.insert(existingProductIndex, existingProduct);
+      notifyListeners();
+      throw HttpException('Could not delete product');
+    }
+    existingProduct = null;
   }
 
   Future<void> fetchAndSetProduct() async {
@@ -97,7 +111,7 @@ class Products with ChangeNotifier {
 
   Future<void> addProduct(Product product) async {
     const url = 'https://test-project-53c14.firebaseio.com/products.json';
-    //   const url = 'https://test-project-53c14.firebaseio.com/products.json';
+
     try {
       final response = await http.post(
         url,
