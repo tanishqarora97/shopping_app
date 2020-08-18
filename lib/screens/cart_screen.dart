@@ -85,20 +85,21 @@ class _OrderButtonState extends State<OrderButton> {
               child: CircularProgressIndicator(),
             )
           : Text('Order Now'),
-      onPressed: (widget.cart.totalAmount <= 0||_isloading)
+      onPressed: (widget.cart.totalAmount <= 0 || _isloading)
           ? null
-          : () async{
+          : () async {
               setState(() {
                 _isloading = true;
               });
               await Provider.of<Order>(context, listen: false).addOrder(
-                  widget.cart.items.values.toList(), widget.cart.totalAmount);
+                widget.cart.items.values.toList(),
+                widget.cart.totalAmount,
+              );
               widget.cart.clearCart();
-                 setState(() {
+              setState(() {
                 _isloading = false;
               });
             },
-            
       textColor: Theme.of(context).primaryColor,
     );
   }

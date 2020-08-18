@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 
 import 'package:http/http.dart' as http;
-import 'package:shop_app/models/http_exception.dart';
 
+import '../models/http_exception.dart';
 import '../models/order_model.dart';
 import 'cart.dart';
 
@@ -14,9 +14,41 @@ class Order with ChangeNotifier {
     return [..._order];
   }
 
+  Future<void> fetchAndSetOrders() async {
+    const url = 'https://test-project-53c14.firebaseio.com/orders.json';
+    final response = await http.get(url);
+    // print(json.decode(response.body));
+    final List<OrderItem> loadedOrders = [];
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    /*
+    orderId = key
+    orderData = value
+    */
+    if (extractedData == null) {
+      return;
+    }
+    extractedData.forEach((orderId, orderData) {
+      loadedOrders.add(OrderItem(
+        id: orderId,
+        amount: orderData['amount'],
+        dateTime: DateTime.parse(orderData['dateTime']),
+        products: (orderData['product'] as List<dynamic>)
+            .map((items) => CartItem(
+                  id: items['id'],
+                  price: items['price'],
+                  quantity: items['quantity'],
+                  title: items['title'],
+                ))
+            .toList(),
+      ));
+    });
+    _order = loadedOrders.reversed.toList();
+    notifyListeners();
+  }
+
   Future<void> addOrder(List<CartItem> cartProduct, double total) async {
     final timeStamp = DateTime.now();
-    const url = 'https://test-project-53c14.firebaseio.com/oders.json';
+    const url = 'https://test-project-53c14.firebaseio.com/orders.json';
     try {
       final response = await http.post(url,
           body: json.encode({

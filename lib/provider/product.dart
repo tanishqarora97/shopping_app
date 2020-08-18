@@ -22,6 +22,7 @@ class Product with ChangeNotifier {
   });
   void _setFavStatus(bool newValue) {
     isFavorite = newValue;
+    notifyListeners();
   }
 
   Future<void> toggleFavorite() async {
@@ -36,11 +37,9 @@ class Product with ChangeNotifier {
           }));
       if (response.statusCode >= 400) {
         _setFavStatus(oldStatus);
-        notifyListeners();
       }
     } catch (e) {
-           _setFavStatus(oldStatus);
-      notifyListeners();
+      _setFavStatus(oldStatus);
     }
   }
 }

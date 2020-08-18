@@ -21,7 +21,7 @@ class ProductItem extends StatelessWidget {
           child: Card(
             elevation: 5.0,
             child: Image.network(
-              product.imageUrl,
+              product.imageUrl.toString(),
               fit: BoxFit.cover,
             ),
           ),
@@ -44,8 +44,8 @@ class ProductItem extends StatelessWidget {
             color: Theme.of(context).accentColor,
             onPressed: () {
               cart.addItems(
-                productId: product.id,
-                title: product.title,
+                productId: product.id.toString(),
+                title: product.title.toString(),
                 price: product.price,
               );
               Scaffold.of(context).hideCurrentSnackBar();
@@ -64,7 +64,7 @@ class ProductItem extends StatelessWidget {
             },
           ),
           title: Text(
-            product.title,
+            product.title.toString(),
             textAlign: TextAlign.center,
           ),
         ),
