@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/provider/auth.dart';
+import 'package:shop_app/screens/auth_screen.dart';
 import 'package:shop_app/screens/edit_product_screen.dart';
+import 'package:shop_app/screens/splash_screen.dart';
 
 import './screens/user_product_screen.dart';
 import './provider/order.dart';
@@ -20,31 +23,51 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => Products(),
+          create: (context) => Auth(),
+        ),
+        ChangeNotifierProxyProvider<Auth, Products>(
+          update: (context, auth, previousProduct) => Products(
+              auth.token,
+              previousProduct == null ? [] : previousProduct.items,
+              auth.userId),
         ),
         ChangeNotifierProvider(
           create: (context) => Cart(),
         ),
-        ChangeNotifierProvider(
-          create: (context) => Order(),
-        )
-      ],
-      child: MaterialApp(
-        title: 'MyShop',
-        theme: ThemeData(
-          primarySwatch: Colors.purple,
-          accentColor: Colors.deepOrange,
-          fontFamily: GoogleFonts.lato().fontFamily,
+        ChangeNotifierProxyProvider<Auth, Order>(
+          // create: (context) => Order(),
+          update: (context, auth, previousOrders) => Order(auth.token,
+              previousOrders == null ? [] : previousOrders.orders, auth.userId),
         ),
-        routes: {
-          UserProductScreen.routeName: (context) => UserProductScreen(),
-          EditProductScreen.routename: (context) => EditProductScreen(),
-          ProductOverviewScreen.routeName: (context) => ProductOverviewScreen(),
-          OrdersScreen.routeName: (context) => OrdersScreen(),
-          ProductDetailsScreen.routeName: (context) => ProductDetailsScreen(),
-          CartScreen.routeName: (context) => CartScreen(),
-        },
-        home: ProductOverviewScreen(),
+      ],
+      child: Consumer<Auth>(
+        builder: (context, auth, _) => MaterialApp(
+          title: 'MyShop',
+          theme: ThemeData(
+            primarySwatch: Colors.purple,
+            accentColor: Colors.deepOrange,
+            fontFamily: GoogleFonts.lato().fontFamily,
+          ),
+          routes: {
+            UserProductScreen.routeName: (context) => UserProductScreen(),
+            EditProductScreen.routename: (context) => EditProductScreen(),
+            ProductOverviewScreen.routeName: (context) =>
+                ProductOverviewScreen(),
+            OrdersScreen.routeName: (context) => OrdersScreen(),
+            ProductDetailsScreen.routeName: (context) => ProductDetailsScreen(),
+            CartScreen.routeName: (context) => CartScreen(),
+          },
+          home: auth.isAuth
+              ? ProductOverviewScreen()
+              : FutureBuilder(
+                  future: auth.tryAutoLogin(),
+                  builder: (context, authResultSnapshot) =>
+                      authResultSnapshot.connectionState ==
+                              ConnectionState.waiting
+                          ? SplashScreen()
+                          : AuthScreen(),
+                ),
+        ),
       ),
     );
   }

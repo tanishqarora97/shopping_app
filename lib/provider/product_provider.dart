@@ -8,6 +8,9 @@ import 'package:shop_app/models/http_exception.dart';
 import 'product.dart';
 
 class Products with ChangeNotifier {
+  final String authToken;
+  final String userId;
+  Products(this.authToken, this._items, this.userId);
   List<Product> _items = [];
   List<Product> get favItems {
     return [
@@ -39,7 +42,8 @@ class Products with ChangeNotifier {
   Future<void> updateProduct(String id, Product newProduct) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
-      final url = 'https://test-project-53c14.firebaseio.com/products/$id.json';
+      final url =
+          'https://test-project-53c14.firebaseio.com/products/$id.json?auth=$authToken';
       try {
         await http.patch(url,
             body: json.encode({
@@ -51,7 +55,6 @@ class Products with ChangeNotifier {
               //  'id': newProduct.id,
             }));
         _items[prodIndex] = newProduct;
-        print('Data Updated successfully');
         notifyListeners();
       } catch (e) {
         print(e);
@@ -60,12 +63,12 @@ class Products with ChangeNotifier {
     } else {
       print('prod index not found');
     }
-
     notifyListeners();
   }
 
   Future<void> deleteProduct(String id) async {
-    final url = 'https://test-project-53c14.firebaseio.com/products/$id.json';
+    final url =
+        'https://test-project-53c14.firebaseio.com/products/$id.json?auth=$authToken';
     final existingProductIndex =
         _items.indexWhere((product) => product.id == id);
     var existingProduct = _items[existingProductIndex];
@@ -73,7 +76,6 @@ class Products with ChangeNotifier {
     notifyListeners();
     final value = await http.delete(url);
 
-    print(value.statusCode);
     if (value.statusCode >= 400) {
       _items.insert(existingProductIndex, existingProduct);
       notifyListeners();
@@ -82,16 +84,22 @@ class Products with ChangeNotifier {
     existingProduct = null;
   }
 
-  Future<void> fetchAndSetProduct() async {
-    const url = 'https://test-project-53c14.firebaseio.com/products.json';
+  Future<void> fetchAndSetProduct([bool filterByUser = false]) async {
+    final filterString = filterByUser?'orderBy="creatorId"&equalTo="$userId"':'';
+    final url =
+        'https://test-project-53c14.firebaseio.com/products.json?auth=$authToken&$filterString';
     try {
       final response = await http.get(url);
-      // print('upcoming data:--${response.body}');
+
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
       final List<Product> loadedProduct = [];
       if (extractedData == null) {
         return;
       }
+      final favUrl =
+          'https://test-project-53c14.firebaseio.com/userFavorites/$userId.json?auth=$authToken';
+      final favoritesResponse = await http.get(favUrl);
+      final favData = json.decode(favoritesResponse.body);
       extractedData.forEach((prodId, prodData) {
         loadedProduct.add(
           Product(
@@ -100,20 +108,20 @@ class Products with ChangeNotifier {
             imageUrl: prodData['imageUrl'],
             price: prodData['price'],
             title: prodData['title'],
-            isFavorite: prodData['isFavorite'],
+            isFavorite: favData == null ? false : favData[prodId] ?? false,
           ),
         );
       });
       _items = loadedProduct;
       notifyListeners();
-      print(extractedData);
     } catch (e) {
       throw e;
     }
   }
 
   Future<void> addProduct(Product product) async {
-    const url = 'https://test-project-53c14.firebaseio.com/products.json';
+    final url =
+        'https://test-project-53c14.firebaseio.com/products.json?auth=$authToken';
 
     try {
       final response = await http.post(
@@ -124,7 +132,9 @@ class Products with ChangeNotifier {
             'description': product.description,
             'imageUrl': product.imageUrl,
             'price': product.price,
-            'isFavorite': product.isFavorite,
+            'creatorId': userId,
+
+            //       'isFavorite': product.isFavorite,
           },
         ),
       );
@@ -136,7 +146,7 @@ class Products with ChangeNotifier {
         imageUrl: product.imageUrl,
         id: json.decode(response.body)['name'],
       );
-      print(newProduct.title);
+
       _items.add(newProduct);
       notifyListeners();
     } catch (e) {
