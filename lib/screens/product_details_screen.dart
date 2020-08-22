@@ -13,41 +13,62 @@ class ProductDetailsScreen extends StatelessWidget {
       listen: false,
     ).findById(productId);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(loadedPages.title),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              child: Image.network(
-                loadedPages.imageUrl,
-                width: double.infinity,
-                fit: BoxFit.cover,
+      // appBar: AppBar(
+
+      // ),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 320,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Hero(
+                tag: loadedPages.id,
+                child: Image.network(
+                  loadedPages.imageUrl,
+                  //   width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
               ),
+              title: Text(loadedPages.title),
             ),
-            SizedBox(
-              height: 10.0,
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                SizedBox(
+                  height: 10.0,
+                ),
+                Text(
+                  '\$ ${loadedPages.price}',
+                  style: TextStyle(color: Colors.grey, fontSize: 20.0),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                Container(
+                  padding: EdgeInsets.all(10.0),
+                  width: double.infinity,
+                  child: Text(
+                    '\$ ${loadedPages.description}',
+                    softWrap: true,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.black, fontSize: 18.0),
+                  ),
+                ),
+              ],
             ),
-            Text(
-              '\$ ${loadedPages.price}',
-              style: TextStyle(color: Colors.grey, fontSize: 20.0),
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-            Container(
-              padding: EdgeInsets.all(10.0),
-              width: double.infinity,
-              child: Text(
-                '\$ ${loadedPages.description}',
-                softWrap: true,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black, fontSize: 18.0),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
+        // child: Column(
+        //   children: [
+        //     Container(
+        //       height: 300,
+        //       child:
+        //     ),
+        //   ],
+        // ),
       ),
     );
   }

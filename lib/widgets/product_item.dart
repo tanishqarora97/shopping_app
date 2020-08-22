@@ -20,10 +20,13 @@ class ProductItem extends StatelessWidget {
             Navigator.of(context).pushNamed(ProductDetailsScreen.routeName,
                 arguments: product.id);
           },
-          child: Card(
-            elevation: 5.0,
-            child: Image.network(
-              product.imageUrl.toString(),
+          child: Hero(
+            tag: product.id,
+            child: FadeInImage(
+              placeholder: AssetImage('assets/original.png'),
+              image: NetworkImage(
+                product.imageUrl.toString(),
+              ),
               fit: BoxFit.cover,
             ),
           ),
