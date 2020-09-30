@@ -19,6 +19,7 @@ import './screens/product_details_screen.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  bool yes;
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
